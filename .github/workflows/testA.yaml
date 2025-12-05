@@ -1,7 +1,7 @@
 name: Test Job
 
 on:
-  push:        # runs whenever you push
+  push:        # runs whenever you push test the github
     branches:
       - "**"   # all branches
 
