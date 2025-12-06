@@ -31,6 +31,7 @@ jobs:
           environment: azurecloud
           allow-no-subscriptions: false
           audience: api://AzureADTokenExchange
+          auth-type: 'OIDC'
       - name: Test azure login my getting details
         run: az account show
 
