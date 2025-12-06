@@ -37,24 +37,30 @@ jobs:
           audience: api://AzureADTokenExchange
 
       - name: Install/Update Azure ML CLI v2 extension
-        run: az extension add -n ml -y || az extension update -n ml
+        run: |
+          az extension add -n ml -y || az extension update -n ml
 
       - name: Configure defaults
-        run: az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZUREML_WORKSPACE_NAME"
+        run: |
+          az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZUREML_WORKSPACE_NAME"
           az account show
 
       - name: yaml_validate
-        run: az ml job validate --file aml/wine_quality_pipeline.yaml --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
+        run: |
+          az ml job validate --file aml/wine_quality_pipeline.yaml --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
 
       - name: yaml_validate2
-        run: az ml workspace show --name "$AZUREML_WORKSPACE_NAME" --resource-group "$AZURE_RESOURCE_GROUP"
+        run: |
+          az ml workspace show --name "$AZUREML_WORKSPACE_NAME" --resource-group "$AZURE_RESOURCE_GROUP"  
 
       - name: yaml_validate3
-        run: az ml code list --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME" -o table
+        run: |
+          az ml code list --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME" -o table
 
       - name: yaml_validate4
-        run:  az ml code show --name cw2_wine_quality --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
-
+        run: |
+          az ml code show --name cw2_wine_quality --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
+          
 
       - name: Submit pipeline
         id: submit
