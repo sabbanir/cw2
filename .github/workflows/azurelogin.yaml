@@ -1,4 +1,4 @@
-name: Azure Login
+name: Azure Login workflow
 
 on:
   push:        # runs whenever you push
