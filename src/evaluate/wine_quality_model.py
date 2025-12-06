@@ -13,6 +13,8 @@ from scipy import stats
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
+import mlflow
+import mlflow.sklearn
 
 # ----------------------
 # 2. Load dataset
