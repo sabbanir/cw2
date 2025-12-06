@@ -37,7 +37,16 @@ jobs:
       - name: List files
         run: ls -la
 
-      - name: aml_validate
+      - name: Configure defaults
+        env:
+#          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+#          AZURE_ML_WORKSPACE: ${{ vars.AZURE_ML_WORKSPACE }}
+          AZURE_RESOURCE_GROUP: "com774_resource"
+          AZURE_ML_WORKSPACE: "com774_workspace"
+        run: |
+            az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZURE_ML_WORKSPACE"
+
+      - name: yaml_validate
         run: |
           az ml job validate --file src/pipelines/win_quality_pipeline.yaml
         
