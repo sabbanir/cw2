@@ -57,7 +57,7 @@ jobs:
       - name: Validate pipeline
         run: az ml job validate --file aml/wine_quality_pipeline.yaml
 
-      - name: Validate pipeline
+      - name: Creating environment for deploy
         run: az ml environment create --file environments/env.yml
 
       - name: Submit pipeline
