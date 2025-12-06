@@ -38,7 +38,9 @@ jobs:
         run: ls -la
 
       - name: aml_validate
-        run: az ml job validate --file src/evaluate/win_quality_pipeline.yaml
+        run: |
+          az ml job validate --file src/pipelines/win_quality_pipeline.yaml
+        
 
 
 
