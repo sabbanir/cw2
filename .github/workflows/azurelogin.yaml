@@ -51,15 +51,15 @@ jobs:
 
       - name: yaml_validate2
         run: |
-          az ml workspace show --name $AZUREML_WORKSPACE_NAME --resource-group $AZURE_RESOURCE_GROUP
+          az ml workspace show --name "com774_workspace" --resource-group "com774_resource"  
 
       - name: yaml_validate3
         run: |
-          az ml code list --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME" -o table
+          az ml code list --resource-group "com774_resource"  --workspace-name "com774_workspace" -o table
 
       - name: yaml_validate4
         run: |
-          az ml code show --name cw2_wine_quality --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
+          az ml code show --name cw2_wine_quality --resource-group "com774_resource"  --workspace-name "com774_workspace"
           
 
       - name: Submit pipeline
