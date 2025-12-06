@@ -31,8 +31,6 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          # Optional: explicit for clarity with v2
-          # auth-type: OIDC
           environment: azurecloud
           allow-no-subscriptions: false
           audience: api://AzureADTokenExchange
