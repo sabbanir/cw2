@@ -8,15 +8,16 @@ on:
 permissions:
   id-token: write
   contents: read
+env:
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  AZUREML_WORKSPACE_NAME: ${{ secrets.AZUREML_WORKSPACE_NAME }}
 
 jobs:
   evaluate_model:
     name: evaluate model
     runs-on: ubuntu-latest
     steps:
-
-      - name: Run echo "Checking out the repository from ${{ github.repository }}."
-        run: echo "Checking out the repository from ${{ github.repository }}."
 
       - name: Clone repository code
         uses: actions/checkout@v4
@@ -37,6 +38,17 @@ jobs:
       - name: List files
         run: ls -la
 
+
+      - name: Set default AzureML workspace
+        run: |
+          az configure --defaults group=$AZURE_RESOURCE_GROUP workspace=$AZUREML_WORKSPACE_NAME
+      - name: Install/Update Azure ML CLI v2 extension
+        run: |
+          az extension add -n ml -y || az extension update -n ml
+
+      - name: Show AML workspace (sanity check)
+        run: az ml workspace show -n "$AZUREML_WORKSPACE_NAME" -g "$AZURE_RESOURCE_GROUP"
+
       - name: Configure defaults
         env:
 #          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
@@ -45,6 +57,18 @@ jobs:
           AZURE_ML_WORKSPACE: com774_workspace
         run: |
             az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZURE_ML_WORKSPACE"
+
+      - name: Submit pipeline
+        id: submit
+        shell: bash
+        run: |
+          # Create the job; capture name (job id)
+          JOB_NAME=$(az ml job create \
+            -f evaluate/wine_quality_pipeline.yaml \
+            --query name -o tsv)
+          echo "job_name=$JOB_NAME" >> $GITHUB_OUTPUT
+          echo "Submitted job: $JOB_NAME"
+
 
       - name: yaml_validate
         run: |
