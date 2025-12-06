@@ -5,6 +5,12 @@ on:
     branches:
       - "**"   # all branches
 
+
+permissions:
+  id-token: write
+  contents: read
+
+
 jobs:
   testJob:
     name: testJob
