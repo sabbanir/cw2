@@ -48,7 +48,7 @@ jobs:
       - name: yaml_validate
         run: |
           az ml job validate --file aml/wine_quality_pipeline.yaml --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
-          az ml workspace show -name "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
+          az ml workspace show --name "$AZUREML_WORKSPACE_NAME" --resource-group "$AZURE_RESOURCE_GROUP"  
           az ml code list --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME" -o table
           az ml code show --name cw2_wine_quality --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
 
