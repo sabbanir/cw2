@@ -32,7 +32,7 @@ jobs:
           activate-environment: smoke-env        # or read from your yml's `name:`
           environment-file: env/conda.yml            # <-- change to environment.yml if that's your file
           use-mamba: true                        # faster solves; optional
-          miniforge-variant: Mambaforge          # optional: provides mamba by default
+          miniforge-variant: Miniforge3          # optional: provides mamba by default
 
       - name: List Conda packages
         shell: bash -l {0}
