@@ -1,6 +1,8 @@
 # ----------------------
 # 1. Imports
 # ----------------------
+import argparse
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -28,7 +30,7 @@ url_red = "wine_quality_dataset_b01048312.csv"
 # df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--trainingdata", type=str, required=True, help='Dataset for training')
+parser.add_argument("--wine_data", type=str, required=True, help='Wine Dataset for training')
 args = parser.parse_args()
 mlflow.autolog()
 # %% [markdown]

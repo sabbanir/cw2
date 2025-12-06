@@ -1,36 +1,27 @@
-name: Azure Login workflow
+name: Running the model
 
 on:
   push:        # runs whenever you push
     branches:
       - "**"   # all branches
 
-
 permissions:
   id-token: write
   contents: read
 
+image: mcr.microsoft.com/azure-cli:latest
 
 jobs:
-  testJob:
-    name: testJob
+  evaluate_model:
+    name: evaluate model
     runs-on: ubuntu-latest
     steps:
-      - name: Run echo "Hi! I'm running because of a push event for azure."
-        run: echo "Hi! I'm running because of a push event."
 
       - name: Run echo "Checking out the repository from ${{ github.repository }}."
         run: echo "Checking out the repository from ${{ github.repository }}."
 
       - name: Clone repository code
         uses: actions/checkout@v4
-
-      - name: Run echo "Repository cloned, I think I'm ready. The files look like this:"
-        run: echo "Repository cloned, I think I'm ready. The files look like this:"
-
-
-      - name: Printing Secrets ${{ secrets.AZURE_SUBSCRIPTION_ID }}""
-        run: echo "Printing Secrets ${{ secrets.AZURE_TENANT_ID }} ${{ secrets.AZURE_CLIENT_ID }}"
 
       - name: Login into Azure test
         uses: azure/login@v2
@@ -41,11 +32,24 @@ jobs:
           environment: azurecloud
           allow-no-subscriptions: false
           audience: api://AzureADTokenExchange
+
       - name: Test azure login my getting details
         run: az account show
 
       - name: List files
         run: ls -la
+
+      - name: aml_validate
+        run:
+            - az ml component create --file src/components/dataprep/component.yaml
+            - az ml component create --file src/components/training/component.yaml
+            - az ml component create --file src/components/evaluate/component.yaml
+            - az ml job validate --file src/pipelines/win_quality_pipeline.yaml
+
+
+
+
+
 
 
 
