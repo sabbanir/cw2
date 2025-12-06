@@ -22,6 +22,10 @@ jobs:
       - name: Run echo "Repository cloned, I think I'm ready. The files look like this:"
         run: echo "Repository cloned, I think I'm ready. The files look like this:"
 
+
+      - name: Printing Secrets ${{ secrets.AZURE_SUBSCRIPTION_ID }}""
+        run: echo "Printing Secrets ${{ secrets.AZURE_TENANT_ID }} ${{ secrets.AZURE_CLIENT_ID }}"
+
       - name: Login into Azure test
         uses: azure/login@v2
         with:
@@ -31,7 +35,6 @@ jobs:
           environment: azurecloud
           allow-no-subscriptions: false
           audience: api://AzureADTokenExchange
-          auth-type: 'OIDC'
       - name: Test azure login my getting details
         run: az account show
 
