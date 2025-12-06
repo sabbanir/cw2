@@ -22,9 +22,6 @@ jobs:
       - name: Run echo "Repository cloned, I think I'm ready. The files look like this:"
         run: echo "Repository cloned, I think I'm ready. The files look like this:"
 
-      - name: List files
-        run: ls -la
-
       - name: Login into Azure test
         uses: azure/login@v2
         with:
@@ -36,3 +33,8 @@ jobs:
           audience: api://AzureADTokenExchange
       - name: Test azure login my getting details
         run: az account show
+
+      - name: List files
+        run: ls -la
+
+
