@@ -42,7 +42,7 @@ mlflow.autolog()
 # "./" means "from where we are now"
 
 # %%
-df = pd.read_csv(args.trainingdata,sep=',')
+df = pd.read_csv(args.wine_data,sep=',')
 
 
 # df = pd.read_csv(url_red, sep=',')
