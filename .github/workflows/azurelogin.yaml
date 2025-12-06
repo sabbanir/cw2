@@ -47,7 +47,7 @@ jobs:
           az extension add -n ml -y || az extension update -n ml
 
       - name: Show AML workspace (sanity check)
-        run: az ml workspace show -n "$AZUREML_WORKSPACE_NAME" -g "$AZURE_RESOURCE_GROUP"
+        run: az ml workspace show -n $AZUREML_WORKSPACE_NAME -g $AZURE_RESOURCE_GROUP
 
       - name: Configure defaults
         env:
