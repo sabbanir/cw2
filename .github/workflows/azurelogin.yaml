@@ -41,8 +41,8 @@ jobs:
         env:
 #          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
 #          AZURE_ML_WORKSPACE: ${{ vars.AZURE_ML_WORKSPACE }}
-          AZURE_RESOURCE_GROUP: "com774_resource"
-          AZURE_ML_WORKSPACE: "com774_workspace"
+          AZURE_RESOURCE_GROUP: com774_resource
+          AZURE_ML_WORKSPACE: com774_workspace
         run: |
             az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZURE_ML_WORKSPACE"
 
