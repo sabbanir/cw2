@@ -58,6 +58,7 @@ jobs:
           # Create the job; capture name (job id)
           JOB_NAME=$(az ml job create \
             -f evaluate/wine_quality_pipeline.yaml \
+            --resource-group $AZURE_RESOURCE_GROUP  --workspace-name $AZUREML_WORKSPACE_NAME
             --query name -o tsv)
           echo "job_name=$JOB_NAME" >> $GITHUB_OUTPUT
           echo "Submitted job: $JOB_NAME"
