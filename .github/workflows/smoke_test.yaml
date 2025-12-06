@@ -1,50 +1,31 @@
-#name: Azure Login workflow
 #
-#on:
-#  push:        # runs whenever you push
-#    branches:
-#      - "**"   # all branches
+#$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+#type: command
+#name: smoke-command
+#display_name: smoke-command
+#description: "Fast smoke test to validate env, code upload, IO"
+#experiment_name: smoke-tests
 #
+## Your tiny source folder (e.g., contains smoke.py)
+#code: ./smoke_src
 #
-#permissions:
-#  id-token: write
-#  contents: read
+## A curated environment (quick to pull)
+## Tip: you can also use azureml:<custom-env>:<version>
+#environment: azureml://registries/azureml/environments/sklearn-1.0/versions/18
 #
+#compute: azureml:cpu-cluster-small   # small/cheap compute for smoke tests
 #
-#jobs:
-#  testJob:
-#    name: testJob
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Run echo "Hi! I'm running because of a push event for azure."
-#        run: echo "Hi! I'm running because of a push event."
+#inputs:
+#  msg:
+#    type: literal
+#    value: "hello from smoke test"
 #
-#      - name: Run echo "Checking out the repository from ${{ github.repository }}."
-#        run: echo "Checking out the repository from ${{ github.repository }}."
+#outputs:
+#  smoke_out:
+#    type: uri_folder
+#    mode: rw_mount  # fast; we're not generating much
 #
-#      - name: Clone repository code
-#        uses: actions/checkout@v4
-#
-#      - name: Run echo "Repository cloned, I think I'm ready. The files look like this:"
-#        run: echo "Repository cloned, I think I'm ready. The files look like this:"
-#
-#
-#      - name: Printing Secrets ${{ secrets.AZURE_SUBSCRIPTION_ID }}""
-#        run: echo "Printing Secrets ${{ secrets.AZURE_TENANT_ID }} ${{ secrets.AZURE_CLIENT_ID }}"
-#
-#      - name: Login into Azure test
-#        uses: azure/login@v2
-#        with:
-#          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-#          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-#          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-#          environment: azurecloud
-#          allow-no-subscriptions: false
-#          audience: api://AzureADTokenExchange
-#      - name: Test azure login my getting details
-#        run: az account show
-#
-#      - name: List files
-#        run: ls -la
-#
-#
+#command: >-
+#  python smoke.py
+#  --msg "${{inputs.msg}}"
+#  --out_dir "${{outputs.smoke_out}}"
