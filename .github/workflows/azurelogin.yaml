@@ -45,6 +45,10 @@ jobs:
           az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZUREML_WORKSPACE_NAME"
           az account show
 
+      - name: yaml_validate
+        run: |
+          az ml job validate --file src/evaluate/wine_quality_pipeline.yaml --resource-group "$AZURE_RESOURCE_GROUP"  --workspace-name "$AZUREML_WORKSPACE_NAME"
+
       - name: Submit pipeline
         id: submit
         shell: bash
@@ -58,10 +62,6 @@ jobs:
           echo "Submitted job: $JOB_NAME"
 
 
-      - name: yaml_validate
-        run: |
-          az ml job validate --file src/evaluate/wine_quality_pipeline.yaml
-        
 
 
 
