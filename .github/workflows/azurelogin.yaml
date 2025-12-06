@@ -51,7 +51,7 @@ jobs:
 
       - name: yaml_validate2
         run: |
-          az ml workspace show --name "$AZUREML_WORKSPACE_NAME" --resource-group "$AZURE_RESOURCE_GROUP"  
+          az ml workspace show --name $AZUREML_WORKSPACE_NAME --resource-group $AZURE_RESOURCE_GROUP
 
       - name: yaml_validate3
         run: |
