@@ -10,8 +10,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 from scipy import stats
-import seaborn as sns
-import matplotlib.pyplot as plt
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns

@@ -8,7 +8,7 @@ inputs:
   winedata:
     type: uri_file
     path: azureml://subscriptions/b9e872d3-bc9a-4cfb-bc41-87c893f4af9c/resourcegroups/com774_resource/workspaces/com774_workspace/datastores/workspaceblobstore/paths/UI/2025-12-06_170716_UTC/wine_quality_dataset_b01048312.csv
-environment: azureml://registries/azureml/environments/com774_wine_quality_env/versions/1
+environment: azureml://locations/uksouth/workspaces/8be2090e-2f14-4d4f-946d-1b4cd1469879/environments/com774_wine_quality_env/versions/1
 compute: com774cluster
 experiment_name: wine_quality
 description: Wine Quality Model evaluation
