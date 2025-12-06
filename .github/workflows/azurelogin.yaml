@@ -9,8 +9,6 @@ permissions:
   id-token: write
   contents: read
 
-image: mcr.microsoft.com/azure-cli:latest
-
 jobs:
   evaluate_model:
     name: evaluate model
@@ -40,11 +38,7 @@ jobs:
         run: ls -la
 
       - name: aml_validate
-        run:
-            - az ml component create --file src/components/dataprep/component.yaml
-            - az ml component create --file src/components/training/component.yaml
-            - az ml component create --file src/components/evaluate/component.yaml
-            - az ml job validate --file src/pipelines/win_quality_pipeline.yaml
+        run: az ml job validate --file src/evaluate/win_quality_pipeline.yaml
 
 
 
