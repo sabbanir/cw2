@@ -10,8 +10,9 @@ permissions:
   contents: read
 env:
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
   AZUREML_WORKSPACE_NAME: ${{ secrets.AZUREML_WORKSPACE_NAME }}
+  AZURE_RESOURCE_GROUP: com774_resource
+  AZURE_ML_WORKSPACE: com774_workspace
 
 jobs:
   evaluate_model:
@@ -50,13 +51,8 @@ jobs:
         run: az ml workspace show -n $AZUREML_WORKSPACE_NAME -g $AZURE_RESOURCE_GROUP
 
       - name: Configure defaults
-        env:
-#          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-#          AZURE_ML_WORKSPACE: ${{ vars.AZURE_ML_WORKSPACE }}
-          AZURE_RESOURCE_GROUP: com774_resource
-          AZURE_ML_WORKSPACE: com774_workspace
         run: |
-            az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZURE_ML_WORKSPACE"
+            az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZUREML_WORKSPACE_NAME"
 
       - name: Submit pipeline
         id: submit
