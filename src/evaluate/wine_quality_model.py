@@ -186,24 +186,24 @@ print(data_summary)
 # Visualizing Data Integrity with Labels - Printing Duplicate
 # ---------------------------
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Example: Load combined dataset
-df = pd.read_csv("wine_quality_dataset_b01048312_null.csv", sep=",")
-
-# Calculate metrics
-total_records = len(df)
-null_records = df.isnull().any(axis=1).sum()
-duplicate_records = df.duplicated().sum()
-non_null_records = total_records - null_records
-
-# Prepare data for visualization
-data_summary = pd.DataFrame({
-    "Category": ["Total Records", "Non-Null Records", "Null Records", "Duplicate Records"],
-    "Count": [total_records, non_null_records, null_records, duplicate_records]
-})
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+#
+# # Example: Load combined dataset
+# df = pd.read_csv("wine_quality_dataset_b01048312_null.csv", sep=",")
+#
+# # Calculate metrics
+# total_records = len(df)
+# null_records = df.isnull().any(axis=1).sum()
+# duplicate_records = df.duplicated().sum()
+# non_null_records = total_records - null_records
+#
+# # Prepare data for visualization
+# data_summary = pd.DataFrame({
+#     "Category": ["Total Records", "Non-Null Records", "Null Records", "Duplicate Records"],
+#     "Count": [total_records, non_null_records, null_records, duplicate_records]
+# })
 
 # ---------------------------
 # Visualization
