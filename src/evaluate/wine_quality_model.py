@@ -1,95 +1,49 @@
-# ----------------------
-# 1. Imports
-# ----------------------
-import argparse
 
-import pandas as pd
+'''Reusable wine-quality ML utilities (no side effects, no plotting).
+This is extracted to enable unit/integration/smoke testing.
+'''
+
+from __future__ import annotations
+import os
+from dataclasses import dataclass
+from typing import Tuple, Dict
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
-from scipy import stats
-import seaborn as sns
-import matplotlib.pyplot as plt
-import joblib
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-# ----------------------
-# 2. Load dataset
-# ----------------------
-#url_red = "winequality-red.csv"
-# url_red = "wine_quality_dataset_b01048312.csv"
+# --- Data generation for tests -------------------------------------------------
+DEFAULT_FEATURES = [
+    'fixed acidity', 'volatile acidity', 'citric acid', 'residual sugar',
+    'chlorides', 'free sulfur dioxide', 'total sulfur dioxide', 'density',
+    'pH', 'sulphates', 'alcohol'
+]
 
-# url_red = "wine_quality_dataset_b01048312_null.csv"
-# url_red = "azureml:wine_quality_dataset_b01048312:1"
+def generate_synthetic_wine_data(n_rows: int = 50, seed: int = 42) -> pd.DataFrame:
+    """Create a tiny synthetic dataset with the same schema as the UCI wine-quality data.
+    The values are random but shaped to look plausible; good enough for smoke/integration tests.
+    """
+    rng = np.random.default_rng(seed)
+    data = {col: rng.normal(loc=0.0, scale=1.0, size=n_rows) for col in DEFAULT_FEATURES}
+    # Make alcohol positive and pH in ~[2.5,4.0]
+    data['alcohol'] = np.clip(rng.normal(10.5, 1.2, n_rows), 0.0, None)
+    data['pH'] = np.clip(rng.normal(3.2, 0.15, n_rows), 2.5, 4.5)
+    # Density around 0.996
+    data['density'] = np.clip(rng.normal(0.996, 0.001, n_rows), 0.990, 1.010)
+    # Target: quality (3-8)
+    quality = np.clip(rng.integers(3, 9, size=n_rows), 3, 8)
+    df = pd.DataFrame(data)
+    df['quality'] = quality
+    return df
 
-# red_wine = pd.read_csv("winequality-red.csv", sep=";")
-# white_wine = pd.read_csv("winequality-white.csv", sep=";")
-# df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
+# --- Preprocessing & modeling --------------------------------------------------
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--wine_data", type=str, required=True, help='Wine Dataset for training')
-args = parser.parse_args()
-mlflow.autolog()
-# %% [markdown]
-# ## First load the data
-# The first thing we need to do is load the data we're going to work with and have a quick look at a summary of it.
-# Pandas gives us a function to read CSV files.
-# **You might need update the location of the dataset to point to the correct place you saved it to!**
-# "../" means "back one directory from where we are now"
-# "./" means "from where we are now"
-
-# %%
-df = pd.read_csv(args.trainingdata,sep=',')
-
-
-# df = pd.read_csv(url_red, sep=',')
-print("Initial data shape:", df.shape)
-print(df.head())
-df.info()
-
-# ----------------------
-# 3. Data Cleaning
-# ----------------------
-# 3.1 Fill missing values (if any)
-df.fillna(df.median(), inplace=True)
-
-# 3.2.1 Print duplicates and null rows
-duplicate = df[df.duplicated()]
-
-print("Duplicate Rows :")
-duplicate.info()
-
-# 3.2.2 Remove duplicate rows
-df.drop_duplicates(inplace=True)
-
-aftterclean = df.copy()
-
-# 3.3 Remove outliers using z-score
-z_scores = np.abs(stats.zscore(df.select_dtypes(include=[np.number])))
-threshold = 3
-df = df[(z_scores < threshold).all(axis=1)]
-print("Data shape after cleaning:", df.shape)
-
-# ----------------------
-# 4. Feature Analysis / Correlation
-# ----------------------
-# Check correlation matrix
-corr_matrix = df.corr().abs()
-upper_tri = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-
-# Identify highly correlated features (>0.85)
-high_corr = [col for col in upper_tri.columns if any(upper_tri[col] > 0.85)]
-print("Highly correlated features to drop:", high_corr)
-df.drop(columns=high_corr, inplace=True)  # optional
-
-# ----------------------
-# 5. Convert target to classes
-# ----------------------
-# Low (<=5), Medium (6), High (>=7)
-def quality_to_class(q):
+def quality_to_class(q: int) -> int:
+    """Map numeric wine quality to three classes as in the user script.
+    Low (<=5) -> 0, Medium (6) -> 1, High (>=7) -> 2
+    """
     if q <= 5:
         return 0
     elif q == 6:
@@ -97,136 +51,65 @@ def quality_to_class(q):
     else:
         return 2
 
-df['quality_class'] = df['quality'].apply(quality_to_class)
-X = df.drop(['quality', 'quality_class'], axis=1)
-y = df['quality_class']
+def clean_data(df: pd.DataFrame, z_threshold: float = 3.0) -> pd.DataFrame:
+    """Fill missing values, drop duplicates, remove numeric outliers via z-score.
+    Keeps the 'quality' column intact.
+    """
+    df = df.copy()
+    # Fill NaNs with column medians (numeric only)
+    df_numeric = df.select_dtypes(include=[np.number])
+    df[df_numeric.columns] = df_numeric.fillna(df_numeric.median())
+    # Drop duplicates
+    df = df.drop_duplicates()
+    # Remove outliers using z-score on numeric cols
+    df_numeric = df.select_dtypes(include=[np.number])
+    if not df_numeric.empty:
+        z_scores = np.abs((df_numeric - df_numeric.mean()) / df_numeric.std(ddof=0))
+        mask = (z_scores < z_threshold).all(axis=1)
+        df = df.loc[mask]
+    return df
 
-print("Class distribution:\n", y.value_counts())
+def make_features(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
+    """Create target column `quality_class` and return (X, y)."""
+    df = df.copy()
+    df['quality_class'] = df['quality'].apply(quality_to_class)
+    X = df.drop(['quality', 'quality_class'], axis=1)
+    y = df['quality_class']
+    return X, y
 
-# ----------------------
-# 6. Train/Test Split
-# ----------------------
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
+@dataclass
+class Split:
+    X_train_scaled: np.ndarray
+    X_test_scaled: np.ndarray
+    y_train: pd.Series
+    y_test: pd.Series
+    scaler: StandardScaler
 
-# ----------------------
-# 7. Feature Scaling
-# ----------------------
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+def split_and_scale(X: pd.DataFrame, y: pd.Series, seed: int = 42) -> Split:
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=seed, stratify=y
+    )
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    return Split(X_train_scaled, X_test_scaled, y_train, y_test, scaler)
 
-# ----------------------
-# 8. Train Random Forest Classifier
-# ----------------------
-clf = RandomForestClassifier(n_estimators=200, random_state=42, class_weight="balanced")
-clf.fit(X_train_scaled, y_train)
+def train_rf(split: Split, n_estimators: int = 100, seed: int = 42) -> RandomForestClassifier:
+    clf = RandomForestClassifier(n_estimators=n_estimators, random_state=seed, class_weight="balanced")
+    clf.fit(split.X_train_scaled, split.y_train)
+    return clf
 
-# ----------------------
-# 9. Evaluate Model
-# ----------------------
-y_pred = clf.predict(X_test_scaled)
-print("Classification Report:\n")
-print(classification_report(y_test, y_pred))
+def evaluate(clf: RandomForestClassifier, split: Split) -> Dict[str, object]:
+    y_pred = clf.predict(split.X_test_scaled)
+    report = classification_report(split.y_test, y_pred, output_dict=True)
+    cm = confusion_matrix(split.y_test, y_pred)
+    return {"report": report, "confusion_matrix": cm}
 
-# Confusion matrix visualization
-sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d', cmap='Blues')
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
-plt.title("Confusion Matrix")
-plt.show()
-
-# ----------------------
-# 10. Save model and scaler
-# ----------------------
-joblib.dump(clf, "wine_quality_rf_classifier.pkl")
-joblib.dump(scaler, "wine_quality_scaler.pkl")
-print("Model and scaler saved successfully!")
-
-# Calculate metrics
-total_records = len(aftterclean)
-null_records = aftterclean.isnull().any(axis=1).sum()
-duplicate_records = aftterclean.duplicated().sum()
-non_null_records = total_records - null_records
-
-# Prepare data for visualization
-data_summary = pd.DataFrame({
-    "Category": ["Total Records", "Non-Null Records", "Null Records", "Duplicate Records"],
-    "Count": [total_records, non_null_records, null_records, duplicate_records]
-})
-
-# ---------------------------
-# Visualization
-# ---------------------------
-plt.figure(figsize=(8, 6))
-ax = sns.barplot(x="Category", y="Count", data=data_summary, palette="coolwarm")
-
-# Add count labels on each bar
-for i, row in enumerate(data_summary.itertuples()):
-    ax.text(i, row.Count + total_records * 0.01, f"{row.Count:,}",
-            ha='center', va='bottom', fontsize=11, weight='bold', color='black')
-
-# Beautify the chart
-plt.title("Data Quality Overview: Null, Duplicate, and Non-Null Records", fontsize=14, weight="bold")
-plt.ylabel("Number of Records")
-plt.xlabel("")
-plt.xticks(rotation=15)
-plt.tight_layout()
-plt.show()
-
-# Optional: Print detailed summary
-print("Data Quality Summary:")
-print(data_summary)
-
-
-
-
-# ---------------------------
-# Visualizing Data Integrity with Labels - Printing Duplicate
-# ---------------------------
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Example: Load combined dataset
-df = pd.read_csv("wine_quality_dataset_b01048312_null.csv", sep=",")
-
-# Calculate metrics
-total_records = len(df)
-null_records = df.isnull().any(axis=1).sum()
-duplicate_records = df.duplicated().sum()
-non_null_records = total_records - null_records
-
-# Prepare data for visualization
-data_summary = pd.DataFrame({
-    "Category": ["Total Records", "Non-Null Records", "Null Records", "Duplicate Records"],
-    "Count": [total_records, non_null_records, null_records, duplicate_records]
-})
-
-# ---------------------------
-# Visualization
-# ---------------------------
-plt.figure(figsize=(8, 6))
-ax = sns.barplot(x="Category", y="Count", data=data_summary, palette="coolwarm")
-
-# Add count labels on each bar
-for i, row in enumerate(data_summary.itertuples()):
-    ax.text(i, row.Count + total_records * 0.01, f"{row.Count:,}",
-            ha='center', va='bottom', fontsize=11, weight='bold', color='black')
-
-# Beautify the chart
-plt.title("Data Quality Overview: Null, Duplicate, and Non-Null Records", fontsize=14, weight="bold")
-plt.ylabel("Number of Records")
-plt.xlabel("")
-plt.xticks(rotation=15)
-plt.tight_layout()
-plt.show()
-
-# Optional: Print detailed summary
-print("Data Quality Summary:")
-print(data_summary)
-
-
-
+def save_artifacts(clf: RandomForestClassifier, scaler: StandardScaler, out_dir: str = "artifacts") -> Tuple[str, str]:
+    os.makedirs(out_dir, exist_ok=True)
+    import joblib
+    model_path = os.path.join(out_dir, "wine_quality_rf_classifier.pkl")
+    scaler_path = os.path.join(out_dir, "wine_quality_scaler.pkl")
+    joblib.dump(clf, model_path)
+    joblib.dump(scaler, scaler_path)
+    return model_path, scaler_path
