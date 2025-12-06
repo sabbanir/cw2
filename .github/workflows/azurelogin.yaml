@@ -48,7 +48,7 @@ jobs:
 
       - name: yaml_validate
         run: |
-          az ml job validate --file src/evaluate/win_quality_pipeline.yaml
+          az ml job validate --file src/evaluate/wine_quality_pipeline.yaml
         
 
 
