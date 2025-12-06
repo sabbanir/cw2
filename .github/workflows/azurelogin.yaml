@@ -50,11 +50,6 @@ jobs:
       - name: Configure defaults
         run: |
           az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZUREML_WORKSPACE_NAME"
-          
-          
-      - name: Show AML workspace (sanity check)
-        run: az ml workspace show --name "$AZUREML_WORKSPACE_NAME" --resource-group "$AZURE_RESOURCE_GROUP"
-
 
       - name: Submit pipeline
         id: submit
