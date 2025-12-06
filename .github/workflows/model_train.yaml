@@ -58,7 +58,7 @@ jobs:
         run: az ml job validate --file aml/wine_quality_pipeline.yaml
 
       - name: Validate pipeline
-        run: az ml environment create --file environments/env.yml -resource-group "$AZURE_RESOURCE_GROUP" workspace-name "$AZUREML_WORKSPACE_NAME"
+        run: az ml environment create --file environments/env.yml --resource-group "$AZURE_RESOURCE_GROUP" --workspace-name "$AZUREML_WORKSPACE_NAME"
 
       - name: Submit pipeline
         id: submit
