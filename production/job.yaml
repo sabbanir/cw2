@@ -4,8 +4,9 @@ command: python model.py --trainingdata ${{ inputs.training_data }}
 inputs:
   training_data:
     type: uri_file
-    path: azureml:iris:1
-environment: azureml://registries/azureml/environments/sklearn-1.1/versions/14
+    path: azureml:wine_quality_dataset_b01048312:1
+#environment: azureml://registries/azureml/environments/sklearn-1.1/versions/14
+environment: azureml://registries/azureml/environments/sklearn-1:5/versions/35
 compute: practical6compute
 experiment_name: practical6
 description: Practical6 demo
