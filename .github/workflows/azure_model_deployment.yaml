@@ -1,4 +1,4 @@
-name: Running the model
+name: Building and deploying model in Azure
 
 on:
   push:

@@ -1,58 +1,59 @@
-#name: Running the model with modfied code
-#
-#on:
-#  push:
-#    branches:
-#      - "**"
-#
-#permissions:
-#  id-token: write
-#  contents: read
-#
-#env:
-#  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-#  AZURE_RESOURCE_GROUP: com774_resource
-#  AZUREML_WORKSPACE_NAME: com774_workspace
-#
-#jobs:
-#  evaluate_model:
-#    name: Evaluate Model
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Azure login
-#        uses: azure/login@v2
-#        with:
-#          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-#          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-#          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-#          audience: api://AzureADTokenExchange
-#
-#      - name: Install Azure ML CLI extension
-#        run: az extension add -n ml -y || az extension update -n ml
-#
-#      - name: Configure Azure ML defaults
-#        run: az configure --defaults group="$AZURE_RESOURCE_GROUP" workspace="$AZUREML_WORKSPACE_NAME"
-#
-#      - name: Validate pipeline
-#        run: az ml job validate --file aml/wine_quality_pipeline.yaml
-#
-#      - name: Submit pipeline
-#        id: submit
-#        run: |
-#          JOB_NAME=$(az ml job create -f aml/wine_quality_pipeline.yaml --query name -o tsv)
-#          echo "job_name=$JOB_NAME" >> $GITHUB_OUTPUT
-#          echo "Submitted job: $JOB_NAME"
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
+image: python:3.11-slim
+
+stages:
+  - test
+
+variables:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHONPATH: "$CI_PROJECT_DIR:$PYTHONPATH"
+  # Make pytest produce JUnit and coverage outputs (paths below)
+  PYTEST_ADDOPTS: "-q --maxfail=1 --disable-warnings --color=yes --junitxml=reports/junit.xml"
+
+cache:
+  key: "pip-${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .cache/pip
+
+# Only run on MRs and pushes to default branch
+# Change refs or add schedules as needed
+test:unit:
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  before_script:
+    - python -V
+    - python -m pip install --upgrade pip wheel setuptools
+    # Install project deps
+    - |
+      if [ -f requirements.txt ]; then
+        pip install -r requirements.txt
+      elif [ -f pyproject.toml ]; then
+        # If you use Poetry:
+        python -m pip install poetry
+        poetry config virtualenvs.in-project true
+        poetry install --no-interaction --no-ansi
+      else
+        pip install pytest pytest-cov
+      fi
+    # Optional: install package in editable mode to expose 'utility/'
+    - |
+      if [ -f setup.py ] || [ -f pyproject.toml ]; then
+        pip install -e .
+      fi
+  script:
+    # Run only unit tests (adjust pattern as you prefer)
+    - pytest tests/TestWineQualityUnit.py --cov=utility --cov-report=xml:test-reports/coverage.xml
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - reports/
+      - test-reports/
+      - .coverage
+    reports:
+      junit: reports/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: test-reports/coverage.xml
