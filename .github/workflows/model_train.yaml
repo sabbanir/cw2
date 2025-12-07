@@ -26,22 +26,22 @@ jobs:
         uses: actions/checkout@v4
 
 
-#      # Install Miniconda and create the env from your conda.yml/environment.yml
-#      - name: Set up Conda and create environment
-#        uses: conda-incubator/setup-miniconda@v3
-#        with:
-#          auto-update-conda: true
-##          python-version: "3.10"
-#          activate-environment: com774_wine_quality_env        # or read from your yml's `name:`
-#          environment-file: environments/env/conda.yml            # <-- change to environment.yml if that's your file
-#          use-mamba: true                        # faster solves; optional
-#          miniforge-variant: Miniforge3          # optional: provides mamba by default
-#
-#      - name: List Conda packages
-#        shell: bash -l {0}
-#        run: |
-#          conda info
-#          conda list
+      # Install Miniconda and create the env from your conda.yml/environment.yml
+      - name: Set up Conda and create environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+#          python-version: "3.10"
+          activate-environment: com774_wine_quality_env        # or read from your yml's `name:`
+          environment-file: environments/env/conda.yml            # <-- change to environment.yml if that's your file
+          use-mamba: true                        # faster solves; optional
+          miniforge-variant: Miniforge3          # optional: provides mamba by default
+
+      - name: List Conda packages
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda list
 
       - name: Azure login
         uses: azure/login@v2
@@ -60,16 +60,16 @@ jobs:
       - name: Validate pipeline
         run: az ml job validate --file aml/wine_quality_pipeline.yaml
 
-#      - name: Creating environment for deploy
-#        run: az ml environment create --file environments/env.yml
+      - name: Creating environment for deploy
+        run: az ml environment create --file environments/env.yml
 
 
-      - name: Creating docker environment for deploy
-        run: |
-          docker build -t $ACR_NAME.azurecr.io/$IMG_TAG .
-          az acr login --name $ACR_NAME
-          docker push $ACR_NAME.azurecr.io/$IMG_TAG
-          az acr show --name com774dockerimage --resource-group com774_resource -o table
+#      - name: Creating docker environment for deploy
+#        run: |
+#          docker build -t $ACR_NAME.azurecr.io/$IMG_TAG .
+#          az acr login --name $ACR_NAME
+#          docker push $ACR_NAME.azurecr.io/$IMG_TAG
+#          az acr show --name com774dockerimage --resource-group com774_resource -o table
 
       - name: Submit pipeline
         id: submit
