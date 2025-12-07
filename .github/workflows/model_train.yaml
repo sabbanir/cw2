@@ -13,7 +13,7 @@ env:
   AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   AZURE_RESOURCE_GROUP: com774_resource
   AZUREML_WORKSPACE_NAME: com774_workspace
-  ACR_NAME: wine_quality_docker_image
+  ACR_NAME: com774_docker_image
   IMG_TAG: mljob:1.0.0
 
 
