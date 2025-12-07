@@ -1,12 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 code: ../src
+#command: python evaluate/wine_quality_model.py --wine_data ${{ inputs.wine_data }}
 command: >-
-  python wine_quality_model.py  --wine_data_red ${{inputs.winequality_red_b01048312}} \
-  --wine_data_white ${{inputs.winequality_white_b01048312}} \
-  --out_dir ./artifacts \
-  --azure_tracking_uri azureml://uksouth.api.azureml.ms/mlflow/v1.0/subscriptions/b9e872d3-bc9a-4cfb-bc41-87c893f4af9c/resourceGroups/com774_resource/providers/Microsoft.MachineLearningServices/workspaces/com774_workspace \
-  --registered_model_name wine-quality-rf
-
+  python wine_quality_model.py  --wine_data_red ${{inputs.winequality_red_b01048312}} --wine_data_white ${{inputs.winequality_white_b01048312}} --out_dir ./artifacts
 
 inputs:
   winequality_red_b01048312:
