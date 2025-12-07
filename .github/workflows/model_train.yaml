@@ -74,6 +74,7 @@ jobs:
       - name: Submit pipeline
         id: submit
         run: |
+          az acr login --name $ACR_NAME
           JOB_NAME=$(az ml job create -f aml/wine_quality_pipeline.yaml --query name -o tsv)
           echo "job_name=$JOB_NAME" >> $GITHUB_OUTPUT
           echo "Submitted job: $JOB_NAME"
