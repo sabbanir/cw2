@@ -10,7 +10,7 @@ inputs:
     path: azureml://subscriptions/b9e872d3-bc9a-4cfb-bc41-87c893f4af9c/resourcegroups/com774_resource/workspaces/com774_workspace/datastores/workspaceblobstore/paths/UI/2025-12-06_170716_UTC/wine_quality_dataset_b01048312.csv
 #environment: azureml:com774_wine_quality_env:3
 environment:
-  image: com774dockerimage.azurecr.io/aml-app:1.0.0
+  image: com774dockerimage.azurecr.io/wineimage:1.0.0
 compute: com774cluster
 experiment_name: wine_quality
 description: Wine Quality Model evaluation

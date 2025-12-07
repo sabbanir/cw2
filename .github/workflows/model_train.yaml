@@ -14,7 +14,7 @@ env:
   AZURE_RESOURCE_GROUP: com774_resource
   AZUREML_WORKSPACE_NAME: com774_workspace
   ACR_NAME: com774dockerimage
-  IMG_TAG: mljob:1.0.0
+  IMG_TAG: wineimage:1.0.0
 
 
 jobs:
