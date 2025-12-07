@@ -2,8 +2,6 @@
 # 1. Imports
 # ----------------------
 import argparse
-import os
-from typing import Dict
 
 import pandas as pd
 import numpy as np
@@ -17,15 +15,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import mlflow
 import mlflow.sklearn
-import numpy as np
-import pandas as pd
-import seaborn as sns
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-
-from utility.wine_quality_lib import clean_data, quality_to_class, split_and_scale,make_features,train_rf,evaluate
 
 # ----------------------
 # 2. Load dataset
@@ -34,6 +23,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--wine_data_red", type=str, required=True, help='Red Wine Dataset for training')
 parser.add_argument("--wine_data_white", type=str, required=True, help='White Wine Dataset for training')
 parser.add_argument("--out_dir", type=str, default="artifacts", help="Directory to save plots & outputs")
+parser.add_argument("--azure_tracking_uri", type=str, default="artifacts", help="azure_tracking_uri")
+parser.add_argument("--registered_model_name", type=str, default="artifacts", help="registered_model_name")
 args = parser.parse_args()
 os.makedirs(args.out_dir, exist_ok=True)
 mlflow.autolog()
@@ -47,7 +38,6 @@ df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 # df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
 
-# df = pd.read_csv(url_red, sep=',')
 print("Initial data shape:", df.shape)
 print(df.head())
 df.info()
@@ -138,6 +128,11 @@ plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Confusion Matrix")
 plt.show()
+cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
+plt.tight_layout()
+plt.savefig(cm_png)
+plt.close()
+mlflow.log_artifact(cm_png)
 
 # ----------------------
 # 10. Save model and scaler
@@ -161,30 +156,51 @@ data_summary = pd.DataFrame({
 # ---------------------------
 # Visualization
 # ---------------------------
-# plt.figure(figsize=(8, 6))
-# ax = sns.barplot(x="Category", y="Count", data=data_summary, palette="coolwarm")
-#
-# # Add count labels on each bar
-# for i, row in enumerate(data_summary.itertuples()):
-#     ax.text(i, row.Count + total_records * 0.01, f"{row.Count:,}",
-#             ha='center', va='bottom', fontsize=11, weight='bold', color='black')
-#
-# # Beautify the chart
-# plt.title("Data Quality Overview: Null, Duplicate, and Non-Null Records", fontsize=14, weight="bold")
-# plt.ylabel("Number of Records")
-# plt.xlabel("")
-# plt.xticks(rotation=15)
-# plt.tight_layout()
-# plt.show()
-# cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
-# plt.tight_layout()
-# plt.savefig(cm_png)
-# plt.close()
-# mlflow.log_artifact(cm_png)
-# # Optional: Print detailed summary
-# print("Data Quality Summary:")
-# print(data_summary)
+plt.figure(figsize=(8, 6))
+ax = sns.barplot(x="Category", y="Count", data=data_summary, palette="coolwarm")
 
+# Add count labels on each bar
+for i, row in enumerate(data_summary.itertuples()):
+    ax.text(i, row.Count + total_records * 0.01, f"{row.Count:,}",
+            ha='center', va='bottom', fontsize=11, weight='bold', color='black')
+
+# Beautify the chart
+plt.title("Data Quality Overview: Null, Duplicate, and Non-Null Records", fontsize=14, weight="bold")
+plt.ylabel("Number of Records")
+plt.xlabel("")
+plt.xticks(rotation=15)
+plt.tight_layout()
+plt.show()
+
+# Optional: Print detailed summary
+print("Data Quality Summary:")
+print(data_summary)
+
+
+
+
+# ---------------------------
+# Visualizing Data Integrity with Labels - Printing Duplicate
+# ---------------------------
+
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+#
+# # Example: Load combined dataset
+# df = pd.read_csv("wine_quality_dataset_b01048312_null.csv", sep=",")
+#
+# # Calculate metrics
+# total_records = len(df)
+# null_records = df.isnull().any(axis=1).sum()
+# duplicate_records = df.duplicated().sum()
+# non_null_records = total_records - null_records
+#
+# # Prepare data for visualization
+# data_summary = pd.DataFrame({
+#     "Category": ["Total Records", "Non-Null Records", "Null Records", "Duplicate Records"],
+#     "Count": [total_records, non_null_records, null_records, duplicate_records]
+# })
 
 # ---------------------------
 # Visualization
@@ -205,10 +221,6 @@ plt.xticks(rotation=15)
 plt.tight_layout()
 plt.show()
 
-quality_png = os.path.join(args.out_dir, "quality_matrix.png")
-plt.tight_layout()
-plt.savefig(quality_png)
-plt.close()
 # Optional: Print detailed summary
 print("Data Quality Summary:")
 print(data_summary)
