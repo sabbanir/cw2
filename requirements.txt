@@ -5,6 +5,7 @@ scikit-learn
 matplotlib
 numpy
 joblib
+locust
 azure-ai-ml
 azureml-defaults
 azureml-core
