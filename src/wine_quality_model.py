@@ -16,27 +16,27 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from src.utility.wine_quality_lib import clean_data, quality_to_class, split_and_scale,make_features,train_rf,evaluate
+from utility.wine_quality_lib import clean_data, quality_to_class, split_and_scale,make_features,train_rf,evaluate
 
 # ----------------------
 # 2. Load dataset
 # ----------------------
-parser = argparse.ArgumentParser()
-parser.add_argument("--wine_data_red", type=str, required=True, help='Red Wine Dataset for training')
-parser.add_argument("--wine_data_white", type=str, required=True, help='White Wine Dataset for training')
-parser.add_argument("--out_dir", type=str, default="artifacts", help="Directory to save plots & outputs")
-args = parser.parse_args()
-os.makedirs(args.out_dir, exist_ok=True)
-mlflow.autolog()
-
-red_wine = pd.read_csv(args.wine_data_red, sep=',')
-white_wine = pd.read_csv(args.wine_data_white, sep=',')
-df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
-
-
-# red_wine = pd.read_csv("data/winequality_red_b01048312.csv", sep=";")
-# white_wine = pd.read_csv("data/winequality_white_b01048312.csv", sep=";")
+# parser = argparse.ArgumentParser()
+# parser.add_argument("--wine_data_red", type=str, required=True, help='Red Wine Dataset for training')
+# parser.add_argument("--wine_data_white", type=str, required=True, help='White Wine Dataset for training')
+# parser.add_argument("--out_dir", type=str, default="artifacts", help="Directory to save plots & outputs")
+# args = parser.parse_args()
+# os.makedirs(args.out_dir, exist_ok=True)
+# mlflow.autolog()
+#
+# red_wine = pd.read_csv(args.wine_data_red, sep=',')
+# white_wine = pd.read_csv(args.wine_data_white, sep=',')
 # df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
+
+
+red_wine = pd.read_csv("data/winequality_red_b01048312.csv", sep=";")
+white_wine = pd.read_csv("data/winequality_white_b01048312.csv", sep=";")
+df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
 
 
