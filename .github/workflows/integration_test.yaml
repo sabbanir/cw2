@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   unit-tests:
+    if: github.event_name == 'pull'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,6 +34,7 @@ jobs:
           pytest -q src/tests/TestWineQualityUnit.py
 
   integration-tests:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
