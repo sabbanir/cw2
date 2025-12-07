@@ -17,13 +17,16 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+from src.utility.wine_quality_lib import (quality_to_class,clean_data)
+
 # ----------------------
 # 2. Load dataset
 # ----------------------
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--wine_data", type=str, required=True, help='Wine Dataset for training')
+parser.add_argument("--wine_data_red", type=str, required=True, help='Red Wine Dataset for training')
+parser.add_argument("--wine_data_white", type=str, required=True, help='White Wine Dataset for training')
 parser.add_argument("--out_dir", type=str, default="artifacts", help="Directory to save plots & outputs")
 args = parser.parse_args()
 mlflow.autolog()
@@ -37,12 +40,17 @@ mlflow.autolog()
 
 # %%
 
-# red_wine = pd.read_csv("winequality-red.csv", sep=";")
-# white_wine = pd.read_csv("winequality-white.csv", sep=";")
+red_wine = pd.read_csv(args.wine_data_red, sep=',')
+white_wine = pd.read_csv(args.wine_data_white, sep=',')
+df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
+
+
+# red_wine = pd.read_csv("winequality_red_b01048312.csv", sep=";")
+# white_wine = pd.read_csv("winequality_white_b01048312.csv", sep=";")
 # df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
 
-df = pd.read_csv(args.wine_data, sep=',')
+# df = pd.read_csv(args.wine_data, sep=',')
 
 # df = pd.read_csv(url_red, sep=',')
 print("Initial data shape:", df.shape)
@@ -53,16 +61,19 @@ df.info()
 # 3. Data Cleaning
 # ----------------------
 # 3.1 Fill missing values (if any)
-df.fillna(df.median(), inplace=True)
 
-# 3.2.1 Print duplicates and null rows
-duplicate = df[df.duplicated()]
 
-print("Duplicate Rows :")
-duplicate.info()
-
-# 3.2.2 Remove duplicate rows
-df.drop_duplicates(inplace=True)
+df = clean_data(df)
+# df.fillna(df.median(), inplace=True)
+#
+# # 3.2.1 Print duplicates and null rows
+# duplicate = df[df.duplicated()]
+#
+# print("Duplicate Rows :")
+# duplicate.info()
+#
+# # 3.2.2 Remove duplicate rows
+# df.drop_duplicates(inplace=True)
 
 aftterclean = df.copy()
 
@@ -84,18 +95,6 @@ high_corr = [col for col in upper_tri.columns if any(upper_tri[col] > 0.85)]
 print("Highly correlated features to drop:", high_corr)
 df.drop(columns=high_corr, inplace=True)  # optional
 
-
-# ----------------------
-# 5. Convert target to classes
-# ----------------------
-# Low (<=5), Medium (6), High (>=7)
-def quality_to_class(q):
-    if q <= 5:
-        return 0
-    elif q == 6:
-        return 1
-    else:
-        return 2
 
 
 df['quality_class'] = df['quality'].apply(quality_to_class)
@@ -191,11 +190,11 @@ sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Confusion Matrix")
-cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
+# cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
 plt.tight_layout()
-plt.savefig(cm_png)
+# plt.savefig(cm_png)
 plt.close()
-mlflow.log_artifact(cm_png)
+# mlflow.log_artifact(cm_png)
 
 
 

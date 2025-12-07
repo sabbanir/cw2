@@ -2,13 +2,15 @@ $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 code: ../src
 #command: python evaluate/wine_quality_model.py --wine_data ${{ inputs.wine_data }}
 command: >-
-  python evaluate/wine_quality_model.py  --wine_data ${{inputs.winedata}} --out_dir ./artifacts
+  python evaluate/wine_quality_model.py  --wine_data_red ${{inputs.winequality_red_b01048312}} --wine_data_white ${{inputs.winequality_white_b01048312}} --out_dir ./artifacts
 
 inputs:
-  winedata:
+  winequality_red_b01048312:
     type: uri_file
-    path: azureml:wine_quality_dataset_b01048312:1
-#    path: azureml://subscriptions/b9e872d3-bc9a-4cfb-bc41-87c893f4af9c/resourcegroups/com774_resource/workspaces/com774_workspace/datastores/workspaceblobstore/paths/UI/2025-12-06_170716_UTC/wine_quality_dataset_b01048312.csv
+    path: azureml:winequality_red_b01048312:1
+  winequality_white_b01048312:
+    type: uri_file
+    path: azureml:winequality_white_b01048312:1
 environment: azureml:com774_wine_quality_env:3
 #environment:
 #  image: com774dockerimage.azurecr.io/wineimage:1.0.0
