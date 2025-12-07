@@ -29,6 +29,16 @@ from utility.wine_quality_lib import (
     save_artifacts,
 )
 
+def plot_confusion_matrix(cm, out_dir):
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+    plt.title("Confusion Matrix")
+    plt.ylabel("True label")
+    plt.xlabel("Predicted label")
+    plt.savefig(os.path.join(out_dir, "confusion_matrix.png"))
+    plt.close()
+
+
 # ----------------------
 # 2. Load dataset
 # ----------------------
