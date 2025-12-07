@@ -54,10 +54,6 @@ red_wine = pd.read_csv(args.wine_data_red, sep=';')
 white_wine = pd.read_csv(args.wine_data_white, sep=';')
 df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
-# red_wine = pd.read_csv("data/winequality_red_b01048312.csv", sep=";")
-# white_wine = pd.read_csv("data/winequality_white_b01048312.csv", sep=";")
-# df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
-
 
 print("Initial data shape:", df.shape)
 print(df.head())
