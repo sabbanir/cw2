@@ -32,10 +32,10 @@ from utility.wine_quality_lib import (
 def plot_confusion_matrix(cm, out_dir):
     plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-    plt.title("Confusion Matrix")
+    plt.title("Classification Matrix")
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
-    plt.savefig(os.path.join(out_dir, "confusion_matrix.png"))
+    plt.savefig(os.path.join(out_dir, "classification_matrix.png"))
     plt.close()
 
 
