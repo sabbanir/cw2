@@ -24,6 +24,7 @@ from sklearn.preprocessing import StandardScaler
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--wine_data", type=str, required=True, help='Wine Dataset for training')
+parser.add_argument("--out_dir", type=str, default="artifacts", help="Directory to save plots & outputs")
 args = parser.parse_args()
 mlflow.autolog()
 # %% [markdown]
