@@ -60,29 +60,14 @@ df.info()
 # ----------------------
 # 3. Data Cleaning
 # ----------------------
-# 3.1 Fill missing values (if any)
-
 
 df = clean_data(df)
-# df.fillna(df.median(), inplace=True)
-#
-# # 3.2.1 Print duplicates and null rows
-# duplicate = df[df.duplicated()]
-#
-# print("Duplicate Rows :")
-# duplicate.info()
-#
-# # 3.2.2 Remove duplicate rows
-# df.drop_duplicates(inplace=True)
 
 aftterclean = df.copy()
 
 # 3.3 Remove outliers using z-score
-z_scores = np.abs(stats.zscore(df.select_dtypes(include=[np.number])))
-threshold = 3
-df = df[(z_scores < threshold).all(axis=1)]
 print("Data shape after cleaning:", df.shape)
-
+os.makedirs(args.out_dir, exist_ok=True)
 # ----------------------
 # 4. Feature Analysis / Correlation
 # ----------------------
@@ -190,11 +175,11 @@ sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Confusion Matrix")
-# cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
+cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
 plt.tight_layout()
-# plt.savefig(cm_png)
+plt.savefig(cm_png)
 plt.close()
-# mlflow.log_artifact(cm_png)
+mlflow.log_artifact(cm_png)
 
 
 
@@ -211,29 +196,6 @@ plt.savefig(fi_png)
 plt.close()
 mlflow.log_artifact(fi_png)
 
-
-# ---------------------------
-# Visualizing Data Integrity with Labels - Printing Duplicate
-# ---------------------------
-
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-#
-# # Example: Load combined dataset
-# df = pd.read_csv("wine_quality_dataset_b01048312_null.csv", sep=",")
-#
-# # Calculate metrics
-# total_records = len(df)
-# null_records = df.isnull().any(axis=1).sum()
-# duplicate_records = df.duplicated().sum()
-# non_null_records = total_records - null_records
-#
-# # Prepare data for visualization
-# data_summary = pd.DataFrame({
-#     "Category": ["Total Records", "Non-Null Records", "Null Records", "Duplicate Records"],
-#     "Count": [total_records, non_null_records, null_records, duplicate_records]
-# })
 
 # ---------------------------
 # Visualization
