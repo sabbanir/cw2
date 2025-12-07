@@ -18,7 +18,7 @@ from src.utility.wine_quality_lib import (
     save_artifacts,
 )
 
-class wine_quality_unit(unittest.TestCase):
+class TestWineQualityUnitpy(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Small synthetic dataset for consistent tests
