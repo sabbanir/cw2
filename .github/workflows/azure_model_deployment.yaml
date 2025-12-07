@@ -19,7 +19,7 @@ env:
 
 jobs:
   evaluate_model:
-    name: Evaluate Model
+    name: Build and deploy model
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
