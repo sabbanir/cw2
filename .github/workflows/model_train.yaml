@@ -76,7 +76,6 @@ jobs:
           az acr login --name $ACR_NAME
           docker push $ACR_NAME.azurecr.io/$IMG_TAG
           az acr show --name com774dockerimage --resource-group com774_resource -o table
-          az acr build --registry $ACR_NAME --image $IMG_TAG .
 
 
 
