@@ -3,31 +3,24 @@
 # ----------------------
 import argparse
 
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-from scipy import stats
+import os
+import mlflow
 import joblib
 import matplotlib.pyplot as plt
-import seaborn as sns
-import mlflow
 import mlflow.sklearn
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from scipy import stats
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 # ----------------------
 # 2. Load dataset
 # ----------------------
-#url_red = "winequality-red.csv"
-# url_red = "wine_quality_dataset_b01048312.csv"
 
-# url_red = "wine_quality_dataset_b01048312_null.csv"
-# url_red = "azureml:wine_quality_dataset_b01048312:1"
-
-# red_wine = pd.read_csv("winequality-red.csv", sep=";")
-# white_wine = pd.read_csv("winequality-white.csv", sep=";")
-# df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--wine_data", type=str, required=True, help='Wine Dataset for training')
@@ -42,8 +35,13 @@ mlflow.autolog()
 # "./" means "from where we are now"
 
 # %%
-df = pd.read_csv(args.wine_data,sep=',')
 
+# red_wine = pd.read_csv("winequality-red.csv", sep=";")
+# white_wine = pd.read_csv("winequality-white.csv", sep=";")
+# df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
+
+
+df = pd.read_csv(args.wine_data, sep=',')
 
 # df = pd.read_csv(url_red, sep=',')
 print("Initial data shape:", df.shape)
@@ -85,6 +83,7 @@ high_corr = [col for col in upper_tri.columns if any(upper_tri[col] > 0.85)]
 print("Highly correlated features to drop:", high_corr)
 df.drop(columns=high_corr, inplace=True)  # optional
 
+
 # ----------------------
 # 5. Convert target to classes
 # ----------------------
@@ -96,6 +95,7 @@ def quality_to_class(q):
         return 1
     else:
         return 2
+
 
 df['quality_class'] = df['quality'].apply(quality_to_class)
 X = df.drop(['quality', 'quality_class'], axis=1)
@@ -180,6 +180,36 @@ print("Data Quality Summary:")
 print(data_summary)
 
 
+# ----------------------
+# 10. Plots -> PNG files
+# ----------------------
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(6, 5))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix")
+cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
+plt.tight_layout()
+plt.savefig(cm_png)
+plt.close()
+mlflow.log_artifact(cm_png)
+
+
+
+# Feature Importance
+fi = pd.Series(clf.feature_importances_, index=X.columns).sort_values(ascending=False)
+plt.figure(figsize=(8, 5))
+sns.barplot(x=fi.values[:12], y=fi.index[:12], palette="viridis")
+plt.title("Top 12 Feature Importances")
+plt.xlabel("Importance")
+plt.ylabel("Feature")
+fi_png = os.path.join(args.out_dir, "feature_importance.png")
+plt.tight_layout()
+plt.savefig(fi_png)
+plt.close()
+mlflow.log_artifact(fi_png)
 
 
 # ---------------------------
@@ -227,6 +257,3 @@ plt.show()
 # Optional: Print detailed summary
 print("Data Quality Summary:")
 print(data_summary)
-
-
-
