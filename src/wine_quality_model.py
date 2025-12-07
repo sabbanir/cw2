@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import mlflow
 import mlflow.sklearn
+import os
 
 # ----------------------
 # 2. Load dataset
