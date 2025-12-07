@@ -32,80 +32,84 @@ from utility.wine_quality_lib import (
 def plot_confusion_matrix(cm, out_dir):
     plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-    plt.title("Confusion Matrix")
+    plt.title("Classification Matrix")
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
-    plt.savefig(os.path.join(out_dir, "confusion_matrix.png"))
+    plt.savefig(os.path.join(out_dir, "classification_matrix.png"))
     plt.close()
 
 
 # ----------------------
 # 2. Load dataset
 # ----------------------
-parser = argparse.ArgumentParser()
-parser.add_argument("--wine_data_red", type=str, required=True, help='Red Wine Dataset for training')
-parser.add_argument("--wine_data_white", type=str, required=True, help='White Wine Dataset for training')
-parser.add_argument("--out_dir", type=str, default="artifacts", help="Directory to save plots & outputs")
-args = parser.parse_args()
-os.makedirs(args.out_dir, exist_ok=True)
-mlflow.autolog()
+def wineQualityTrainModel(args):
+    # Load data
+    # red_wine = pd.read_csv(args.wine_data_red, sep=';')
+    # white_wine = pd.read_csv(args.wine_data_white, sep=';')
+    # df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
-red_wine = pd.read_csv(args.wine_data_red, sep=';')
-white_wine = pd.read_csv(args.wine_data_white, sep=';')
-df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
+    red_wine = pd.read_csv("data/winequality_red_b01048312.csv", sep=";")
+    white_wine = pd.read_csv("data/winequality_white_b01048312.csv", sep=";")
+    df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
 
-# red_wine = pd.read_csv("data/winequality_red_b01048312.csv", sep=";")
-# white_wine = pd.read_csv("data/winequality_white_b01048312.csv", sep=";")
-# df = pd.concat([red_wine, white_wine], axis=0).reset_index(drop=True)
+    print("Initial data shape:", df.shape)
+    print(df.head())
+    df.info()
 
+    df_clean = clean_data(df, z_threshold=3.0)
 
-print("Initial data shape:", df.shape)
-print(df.head())
-df.info()
-
-df_clean = clean_data(df, z_threshold=3.0)
-
-df_clean.info()
+    df_clean.info()
 
 
-# 2. Clean
-df_clean = clean_data(df, z_threshold=3.0)
+    # 2. Clean
+    df_clean = clean_data(df, z_threshold=3.0)
 
-# 3. Features/target
-X, y = make_features(df_clean)
+    # 3. Features/target
+    X, y = make_features(df_clean)
 
-# 4. Split & scale
-split = split_and_scale(X, y, seed=123)
+    # 4. Split & scale
+    split = split_and_scale(X, y, seed=123)
 
-# 5. Train
-clf = train_rf(split, n_estimators=120, seed=123)
+    # 5. Train
+    clf = train_rf(split, n_estimators=120, seed=123)
 
-# 6. Evaluate
-results = evaluate(clf, split)
-cm = results["confusion_matrix"]
+    # 6. Evaluate
+    results = evaluate(clf, split)
+    cm = results["confusion_matrix"]
 
-# 7. Save artifacts
-model_path, scaler_path = save_artifacts(clf, split.scaler, out_dir=args.out_dir)
+    # 7. Save artifacts
+    model_path, scaler_path = save_artifacts(clf, split.scaler, out_dir=args.out_dir)
 
-loaded_clf = joblib.load(model_path)
-loaded_scaler = joblib.load(scaler_path)
+    loaded_clf = joblib.load(model_path)
+    loaded_scaler = joblib.load(scaler_path)
 
-# Recreate the scaled test set using loaded scaler to ensure parity
-# (NOTE: split already contains scaled arrays; we ensure logic matches after reload)
-# We need the original X_test to re-transform; reconstruct via indices proportionally
-# In integration paths, we only validate equal lengths and non-error predictions.
-preds_original = clf.predict(split.X_test_scaled)
-preds_loaded = loaded_clf.predict(split.X_test_scaled)
+    # Recreate the scaled test set using loaded scaler to ensure parity
+    # (NOTE: split already contains scaled arrays; we ensure logic matches after reload)
+    # We need the original X_test to re-transform; reconstruct via indices proportionally
+    # In integration paths, we only validate equal lengths and non-error predictions.
+    preds_original = clf.predict(split.X_test_scaled)
+    preds_loaded = loaded_clf.predict(split.X_test_scaled)
 
 
-# Confusion matrix visualization
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
-plt.title("Confusion Matrix")
-plt.show()
-cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
-plt.tight_layout()
-plt.savefig(cm_png)
-plt.close()
-mlflow.log_artifact(cm_png)
+    # Confusion matrix visualization
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.show()
+    cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
+    plt.tight_layout()
+    plt.savefig(cm_png)
+    plt.close()
+    mlflow.log_artifact(cm_png)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--wine_data_red", type=str, required=True, help='Red Wine Dataset for training')
+    parser.add_argument("--wine_data_white", type=str, required=True, help='White Wine Dataset for training')
+    parser.add_argument("--out_dir", type=str, default="artifacts", help="Directory to save plots & outputs")
+    args = parser.parse_args()
+    os.makedirs(args.out_dir, exist_ok=True)
+    mlflow.autolog()
+    wineQualityTrainModel(args)
