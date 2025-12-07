@@ -1,6 +1,6 @@
 pytest==7.1.2
 mlflow
-pandas4
+pandas
 scikit-learn
 matplotlib
 numpy
