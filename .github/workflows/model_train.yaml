@@ -72,8 +72,8 @@ jobs:
 
       - name: Creating docker environment for deploy
         run: |
-          docker build -t $ACR_NAME.azurecr.io/$IMG_TAG .
-          docker push $ACR_NAME.azurecr.io/$IMG_TAG .
+          docker build -t $ACR_NAME.azurecr.io/$IMG_TAG
+          docker push $ACR_NAME.azurecr.io/$IMG_TAG
           az acr show --name com774dockerimage --resource-group com774_resource -o table
           az acr build --registry $ACR_NAME --image $IMG_TAG .
 
