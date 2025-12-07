@@ -2,7 +2,7 @@ $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
 code: ../src
 #command: python evaluate/wine_quality_model.py --wine_data ${{ inputs.wine_data }}
 command: >-
-  python evaluate/wine_quality_model.py  --wine_data_red ${{inputs.winequality_red_b01048312}} --wine_data_white ${{inputs.winequality_white_b01048312}} --out_dir ./artifacts
+  python wine_quality_model.py  --wine_data_red ${{inputs.winequality_red_b01048312}} --wine_data_white ${{inputs.winequality_white_b01048312}} --out_dir ./artifacts
 
 inputs:
   winequality_red_b01048312:
