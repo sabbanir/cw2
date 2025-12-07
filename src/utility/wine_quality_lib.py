@@ -77,6 +77,9 @@ def make_features(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     y = df['quality_class']
     return X, y
 
+
+
+
 @dataclass
 class Split:
     X_train_scaled: np.ndarray
