@@ -1,59 +1,59 @@
-image: python:3.11-slim
 
 stages:
   - test
 
-variables:
-  PIP_DISABLE_PIP_VERSION_CHECK: "1"
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYTHONPATH: "$CI_PROJECT_DIR:$PYTHONPATH"
-  # Make pytest produce JUnit and coverage outputs (paths below)
-  PYTEST_ADDOPTS: "-q --maxfail=1 --disable-warnings --color=yes --junitxml=reports/junit.xml"
-
-cache:
-  key: "pip-${CI_COMMIT_REF_SLUG}"
-  paths:
-    - .cache/pip
-
-# Only run on MRs and pushes to default branch
-# Change refs or add schedules as needed
-test:unit:
+test_unit:
   stage: test
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  image: python:3.11-slim
+
+  variables:
+    PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    PYTHONPATH: "$CI_PROJECT_DIR:$PYTHONPATH"
+    # Produce JUnit + coverage artifacts
+    PYTEST_ADDOPTS: "-q --maxfail=1 --disable-warnings --color=yes --junitxml=reports/junit.xml"
+
+  cache:
+    key: "pip-${CI_COMMIT_REF_SLUG}"
+    paths:
+      - .cache/pip
+
   before_script:
     - python -V
     - python -m pip install --upgrade pip wheel setuptools
-    # Install project deps
+    # Install deps
     - |
       if [ -f requirements.txt ]; then
         pip install -r requirements.txt
       elif [ -f pyproject.toml ]; then
-        # If you use Poetry:
         python -m pip install poetry
         poetry config virtualenvs.in-project true
         poetry install --no-interaction --no-ansi
       else
         pip install pytest pytest-cov
       fi
-    # Optional: install package in editable mode to expose 'utility/'
+    # Optional: install your package to expose `utility/` via editable install
     - |
       if [ -f setup.py ] || [ -f pyproject.toml ]; then
         pip install -e .
       fi
+
   script:
-    # Run only unit tests (adjust pattern as you prefer)
+    # Run your unit tests; adjust the path/pattern to your test file(s)
     - pytest tests/TestWineQualityUnit.py --cov=utility --cov-report=xml:test-reports/coverage.xml
+
   artifacts:
     when: always
     expire_in: 1 week
     paths:
-      - reports/
-      - test-reports/
-      - .coverage
+      - reports/junit.xml
+      - test-reports/coverage.xml
     reports:
       junit: reports/junit.xml
       coverage_report:
         coverage_format: cobertura
         path: test-reports/coverage.xml
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
