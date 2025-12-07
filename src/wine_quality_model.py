@@ -228,6 +228,10 @@ plt.xticks(rotation=15)
 plt.tight_layout()
 plt.show()
 
+quality_png = os.path.join(args.out_dir, "quality_matrix.png")
+plt.tight_layout()
+plt.savefig(quality_png)
+plt.close()
 # Optional: Print detailed summary
 print("Data Quality Summary:")
 print(data_summary)
