@@ -1,11 +1,11 @@
 pytest==7.1.2
-mlflow==1.27.0
-pandas~=1.4
-scikit-learn~=1.1.1
-matplotlib==3.7.3
-numpy==1.26.0
+mlflow
+pandas4
+scikit-learn
+matplotlib
+numpy
 joblib
-azure-ai-ml>=1.0.0,<2.0
+azure-ai-ml
 azureml-defaults
 azureml-core
 azureml-defaults
