@@ -161,53 +161,30 @@ data_summary = pd.DataFrame({
 # ---------------------------
 # Visualization
 # ---------------------------
-plt.figure(figsize=(8, 6))
-ax = sns.barplot(x="Category", y="Count", data=data_summary, palette="coolwarm")
-
-# Add count labels on each bar
-for i, row in enumerate(data_summary.itertuples()):
-    ax.text(i, row.Count + total_records * 0.01, f"{row.Count:,}",
-            ha='center', va='bottom', fontsize=11, weight='bold', color='black')
-
-# Beautify the chart
-plt.title("Data Quality Overview: Null, Duplicate, and Non-Null Records", fontsize=14, weight="bold")
-plt.ylabel("Number of Records")
-plt.xlabel("")
-plt.xticks(rotation=15)
-plt.tight_layout()
-plt.show()
-cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
-plt.tight_layout()
-plt.savefig(cm_png)
-plt.close()
-mlflow.log_artifact(cm_png)
-# Optional: Print detailed summary
-print("Data Quality Summary:")
-print(data_summary)
-
-
-# ---------------------------
-# Visualizing Data Integrity with Labels - Printing Duplicate
-# ---------------------------
-
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn as sns
+# plt.figure(figsize=(8, 6))
+# ax = sns.barplot(x="Category", y="Count", data=data_summary, palette="coolwarm")
 #
-# # Example: Load combined dataset
-# df = pd.read_csv("wine_quality_dataset_b01048312_null.csv", sep=",")
+# # Add count labels on each bar
+# for i, row in enumerate(data_summary.itertuples()):
+#     ax.text(i, row.Count + total_records * 0.01, f"{row.Count:,}",
+#             ha='center', va='bottom', fontsize=11, weight='bold', color='black')
 #
-# # Calculate metrics
-# total_records = len(df)
-# null_records = df.isnull().any(axis=1).sum()
-# duplicate_records = df.duplicated().sum()
-# non_null_records = total_records - null_records
-#
-# # Prepare data for visualization
-# data_summary = pd.DataFrame({
-#     "Category": ["Total Records", "Non-Null Records", "Null Records", "Duplicate Records"],
-#     "Count": [total_records, non_null_records, null_records, duplicate_records]
-# })
+# # Beautify the chart
+# plt.title("Data Quality Overview: Null, Duplicate, and Non-Null Records", fontsize=14, weight="bold")
+# plt.ylabel("Number of Records")
+# plt.xlabel("")
+# plt.xticks(rotation=15)
+# plt.tight_layout()
+# plt.show()
+# cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
+# plt.tight_layout()
+# plt.savefig(cm_png)
+# plt.close()
+# mlflow.log_artifact(cm_png)
+# # Optional: Print detailed summary
+# print("Data Quality Summary:")
+# print(data_summary)
+
 
 # ---------------------------
 # Visualization
