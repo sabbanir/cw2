@@ -5,6 +5,7 @@ import argparse
 
 import pandas as pd
 import numpy as np
+from mlflow.metrics import precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
@@ -16,6 +17,7 @@ import seaborn as sns
 import mlflow
 import mlflow.sklearn
 import os
+from azureml.core import Run
 
 from utility.wine_quality_lib import (
     DEFAULT_FEATURES,
@@ -77,8 +79,12 @@ def wineQualityTrainModel(args):
     results = evaluate(clf, split)
     cm = results["confusion_matrix"]
 
+    mlflow.sklearn.autolog(log_datasets=False)
+    mlflow.sklearn.save_model(clf, args.out_dir)
     # 7. Save artifacts
     model_path, scaler_path = save_artifacts(clf, split.scaler, out_dir=args.out_dir)
+
+
 
     loaded_clf = joblib.load(model_path)
     loaded_scaler = joblib.load(scaler_path)
@@ -103,6 +109,20 @@ def wineQualityTrainModel(args):
     plt.close()
     mlflow.log_artifact(cm_png)
 
+    run = Run.get_context()
+    df['quality_class'] = df['quality'].apply(quality_to_class)
+    X = df.drop(['quality', 'quality_class'], axis=1)
+    y = df['quality_class']
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    # Calculate predictions and accuracy
+    y_pred = clf.predict(X_test)
+    acc = (y_pred == y_test).mean()
+    run.log("accuracy", acc)
+    run.log("precision", precision_score(y_test, y_pred, average="weighted"))
+    run.log("recall", recall_score(y_test, y_pred, average="weighted"))
+    run.log("f1_score", f1_score(y_test, y_pred, average="weighted"))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -14,9 +14,4 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     PIP_DEFAULT_TIMEOUT=120 \
     pip install -vvv --no-cache-dir -r requirements.txt
 
-# RUN pip install --no-cache-dir -r requirements.txt
 
-# optional: add OS tools, or copy helper scripts if you need them
-# COPY src ./src
-
-# The job will mount code at runtime, so we don't set CMD here
