@@ -107,7 +107,8 @@ def wineQualityTrainModel(args):
     )
     # Calculate predictions and accuracy
     y_pred = clf.predict(X_test)
-    acc = (y_pred == y_test).mean()
+    acc = float((y_pred == y_test).mean())
+    mlflow.autolog()
     run.log("accuracy", acc)
     run.log("precision", precision_score(y_test, y_pred, average="weighted"))
     run.log("recall", recall_score(y_test, y_pred, average="weighted"))
@@ -124,6 +125,7 @@ def wineQualityTrainModel(args):
     plt.savefig(cm_png)
     plt.close()
     run.upload_file(name="reports/confusion_matrix.png", path_or_stream=cm_png)
+    run.complete()
 
 
 if __name__ == "__main__":
