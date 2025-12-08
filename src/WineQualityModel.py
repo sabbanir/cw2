@@ -5,11 +5,10 @@ import argparse
 
 import pandas as pd
 import numpy as np
-from mlflow.metrics import precision_score, recall_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, precision_score,recall_score, f1_score
 from scipy import stats
 import joblib
 import matplotlib.pyplot as plt

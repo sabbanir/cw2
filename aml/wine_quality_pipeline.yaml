@@ -10,7 +10,7 @@ inputs:
     path: azureml:winequality_red_b01048312:1
   winequality_white_b01048312:
     type: uri_file
-    path: azureml:winequality_white_b01048312:1
+    path: azureml:winequality_white_b01048312:2
 environment: azureml:com774_wine_quality_env:4
 #environment:
 #  image: com774dockerimage.azurecr.io/wineimage:1.0.0
