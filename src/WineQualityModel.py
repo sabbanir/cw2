@@ -96,17 +96,7 @@ def wineQualityTrainModel(args):
     preds_loaded = loaded_clf.predict(split.X_test_scaled)
 
 
-    # Confusion matrix visualization
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.title("Confusion Matrix")
-    plt.show()
-    cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
-    plt.tight_layout()
-    plt.savefig(cm_png)
-    plt.close()
-    mlflow.log_artifact(cm_png)
+
 
     run = Run.get_context()
     df['quality_class'] = df['quality'].apply(quality_to_class)
@@ -122,6 +112,19 @@ def wineQualityTrainModel(args):
     run.log("precision", precision_score(y_test, y_pred, average="weighted"))
     run.log("recall", recall_score(y_test, y_pred, average="weighted"))
     run.log("f1_score", f1_score(y_test, y_pred, average="weighted"))
+
+    # Confusion matrix visualization
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.show()
+    cm_png = os.path.join(args.out_dir, "confusion_matrix.png")
+    plt.tight_layout()
+    plt.savefig(cm_png)
+    plt.close()
+    run.upload_file(name="reports/confusion_matrix.png", path_or_stream=cm_png)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
