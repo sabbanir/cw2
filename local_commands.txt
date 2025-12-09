@@ -1,0 +1,33 @@
+docker run --rm -p 8080:8080 -it ghcr.io/mlflow/mlflow:v2.0.1 mlflow server --host 127.0.0.1 --port 8080 --backend-store-uri sqlite:///mlflow.db
+
+ 1 python .\WineQualityModel.py --wine_data_red data/winequality_red_b01048312.csv --wine_data_white data/winequality_white_b01048312.csv --out_dir data/
+   2 mlflow models serve -env-manager-local --model-uri wine_quality
+   3 python -m mlflow models serve --env-manager local --model-uri wine_quality
+   4 python .\WineQualityModel.py --wine_data_red data/winequality_red_b01048312.csv --wine_data_white data/winequality_white_b01048312.csv --out_dir data/
+   5 python .\WineQualityModel.py --wine_data_red data/winequality_red_b01048312.csv --wine_data_white data/winequality_white_b01048312.csv --out_dir data/
+   6 python .\WineQualityModel.py --wine_data_red data\winequality_red_b01048312.csv --wine_data_white data\winequality_white_b01048312.csv --out_dir data/
+   7 python .\WineQualityModel.py --wine_data_red data/winequality_red_b01048312.csv --wine_data_white data/winequality_white_b01048312.csv --out_dir model/
+   8 python .\WineQualityModel.py --wine_data_red data/winequality_red_b01048312.csv --wine_data_white data/winequality_white_b01048312.csv --out_dir model/
+   9 python -m mlflow models serve --env-manager local --model-uri wine_quality
+  10 cd .\test\
+  11 python -m mlflow models serve --env-manager local --model-uri wine_quality
+  12 python -m mlflow models serve --env-manager local --model-uri test
+  13 cd ..
+  14 python -m mlflow models serve --env-manager local --model-uri test
+  15 python .\WineQualityModel.py --wine_data_red data/winequality_red_b01048312.csv --wine_data_white data/winequality_white_b01048312.csv --out_dir test/
+  16 python .\WineQualityModel.py --wine_data_red data\winequality_red_b01048312.csv --wine_data_white data\winequality_white_b01048312.csv --out_dir data/
+  17 python -m mlflow models serve --env-manager local --model-uri test
+  18 python -m mlflow models serve --env-manager local --model-uri model
+  19 python .\WineQualityModel.py --wine_data_red data\winequality_red_b01048312.csv --wine_data_white data\winequality_white_b01048312.csv --out_dir wine_quality
+  20 python -m mlflow models serve --env-manager local --model-uri wine_quality
+  21 python .\WineQualityModel.py --wine_data_red data\winequality_red_b01048312.csv --wine_data_white data\winequality_white_b01048312.csv --out_dir wine_quality
+  22 python -m mlflow models serve --env-manager local --model-uri wine_quality
+  23 python -m mlflow models serve --env-manager local --model-uri wine_quality
+  24 docker run --rm -p 8080:8080 -it ghcr.io/mlflow/mlflow:v2.0.1
+  25 mlflow server --host 0.0.0.0 --port 8080 --backend-store-uri
+  26 python -m mlflow models serve --env-manager local --model-uri wine_quality
+  27 python -m mlflow models serve --env-manager local --model-uri wine_quality
+  28 python -m mlflow models serve --env-manager local --model-uri wine_quality --port 5001
+  29 python .\WineQualityModel.py --wine_data_red data/winequality_red_b01048312.csv --wine_data_white data/winequality_white_b01048312.csv --out_dir test/
+  30 python -m mlflow models serve --env-manager local --model-uri test --port 5001
+  31 python -m mlflow models serve --env-manager local --model-uri test --port 8080
